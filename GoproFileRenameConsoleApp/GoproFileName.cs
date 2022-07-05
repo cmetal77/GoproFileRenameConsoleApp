@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace GoproFileRenameConsoleApp
+﻿namespace GoproFileRenameConsoleApp
 {
     internal class GoproFileName
     {
