@@ -1,8 +1,7 @@
 {
   "profiles": {
     "GoproFileRenameConsoleApp": {
-      "commandName": "Project",
-      "commandLineArgs": "d:\\test -w"
+      "commandName": "Project"
     }
   }
 }
