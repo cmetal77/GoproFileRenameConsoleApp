@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-if (args.Length == 1)
+﻿if (args.Length == 1)
     DoWork();
 else
     ShowHelp();
@@ -8,7 +6,7 @@ else
 void DoWork()
 {
     var mp4Files = Directory.GetFiles(args[0])
-                            .Where(f => Path.GetFileName(f).StartsWith("G", true, CultureInfo.CurrentCulture) &&
+                            .Where(f => Path.GetFileName(f).ToLower().StartsWith("g") &&
                                         Path.GetFileNameWithoutExtension(f).Length == 8 &&
                                         string.Compare(Path.GetExtension(f).ToLower(), ".mp4") == 0)
                             .Select(f => new GoproFileName(f))
