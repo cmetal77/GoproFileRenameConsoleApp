@@ -1,22 +1,5 @@
-﻿/*
- * 1. 매개변수로 입력 된 경로 내 mp4 파일 목록 가져오기
- * 2. mp4 목록을 파일 생성 시간 기준으로 정렬 하기
- * 3. 정렬 된 목록에 따라 파일명 앞에 순번 붙이기
- * 4. 파일명 변경 하기
- * 
- * 5. 예외상황 처리
- * 
- * 
- * 실행 매개변수
- * 첫번째 : mp4 파일이 있는 폴더 경로
- * 두번째 : 변경 될 파일이 있는 경우 덮어쓰기(-w), 무시하고 다음 파일로 넘어가기(-i), 중지(-s)
- *          (기본값 = -i)
- * 실행 매개변수가 없이 실행 되는 경우 안내문 표시
- */
-
-using GoproFileRenameConsoleApp;
-
-var renameWorker = new RenameWorker();
+﻿using GoproFileRenameConsoleApp;
+using System.Globalization;
 
 switch (args.Length)
 {
@@ -29,15 +12,6 @@ switch (args.Length)
 
         DoWork();
         break;
-    case 2:
-        if (RenameWorker.IsIn(args[1]))
-        {
-            renameWorker.SetRenameOption(args[1]);
-            DoWork();
-            break;
-        }
-        ShowHelp();
-        return;
     default:
         ShowHelp();
         return;
@@ -45,7 +19,7 @@ switch (args.Length)
 
 void DoWork()
 {
-    var mp4Files = RenameWorker.ListUp(args[0]);
+    var mp4Files = ListUp(args[0]);
 
     if (mp4Files != null && mp4Files.Any())
     {
@@ -57,18 +31,43 @@ void DoWork()
         if (answer.Key == ConsoleKey.Y)
         {
             Console.WriteLine(string.Empty);
-            renameWorker.Rename(mp4Files, m => Console.WriteLine(m));
+            Rename(mp4Files, m => Console.WriteLine(m));
         }
     }
 }
 
 void ShowHelp()
 {
-    Console.WriteLine("GoproFileRenameConsoleApp [파일명] [옵션]");
-    Console.WriteLine("[옵션]");
-    Console.WriteLine("-i : 변경 할 파일이 존재 하는 경우 변경 하지 않고 다음 대상 파일로 넘어 갑니다.");
-    Console.WriteLine("-w : 변경 할 파일이 존재 하는 경우 덮어 씁니다.");
-    Console.WriteLine("-s : 변경 할 파일이 존재 하는 경우 작업을 종료 합니다.");
+    Console.WriteLine("GoproFileRenameConsoleApp [MP4 파일이 있는 폴더 경로]");
+}
+
+void Rename(IEnumerable<GoproFileName> goproFileNames, Action<string> msgOutCallback)
+{
+    foreach (var g in goproFileNames)
+    {
+        if (!File.Exists(g.OrgFileName))
+        {
+            throw new FileNotFoundException(string.Format("{0} 파일이 존재하지 않습니다.", g.OrgFileName));
+        }
+
+        File.Move(g.OrgFileName, g.NewFileName, true);
+        msgOutCallback?.Invoke(string.Format("변경 완료 : {0} -> {1}", Path.GetFileName(g.OrgFileName), Path.GetFileName(g.NewFileName)));
+    }
+}
+
+IEnumerable<GoproFileName>? ListUp(string path)
+{
+    if (Directory.Exists(path))
+    {
+        return Directory.GetFiles(path)
+                            .Where(f => Path.GetFileName(f).StartsWith("G", true, CultureInfo.CurrentCulture) &&
+                                        Path.GetFileNameWithoutExtension(f).Length == 8 &&
+                                        string.Compare(Path.GetExtension(f).ToLower(), ".mp4") == 0)
+                            .Select(f => new GoproFileName(f))
+                            .OrderBy(f => f.ToString());
+    }
+
+    return null;
 }
 
 
