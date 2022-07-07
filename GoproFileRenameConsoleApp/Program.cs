@@ -1,9 +1,4 @@
-﻿if (args.Length == 1)
-    DoWork();
-else
-    ShowHelp();
-
-void DoWork()
+﻿if (args.Length == 1 && Directory.Exists(args[0]))
 {
     var mp4Files = Directory.GetFiles(args[0])
                             .Where(f => Path.GetFileName(f).ToLower().StartsWith("g") &&
@@ -25,11 +20,8 @@ void DoWork()
         Console.WriteLine("이름 변경 대상 MP4 파일이 없습니다.");
     }
 }
-
-void ShowHelp()
-{
+else
     Console.WriteLine("GoproFileRenameConsoleApp [MP4 파일이 있는 폴더 경로]");
-}
 
 class GoproFileName
 {
@@ -39,11 +31,9 @@ class GoproFileName
     public GoproFileName(string orgFilePathName)
     {
         OrgFileName = orgFilePathName;
-
         var orgFileNameWithoutExtention = Path.GetFileNameWithoutExtension(OrgFileName);
         var fileNumber = orgFileNameWithoutExtention.Substring(4);
         var chapterNumber = orgFileNameWithoutExtention.Substring(2, 2);
         NewFileName = Path.Combine(Path.GetDirectoryName(orgFilePathName), String.Format("G{0}{1}_{2}", fileNumber, chapterNumber, Path.GetFileName(OrgFileName)));
     }
 }
-
