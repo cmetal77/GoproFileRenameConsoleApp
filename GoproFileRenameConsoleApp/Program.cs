@@ -21,7 +21,9 @@
     }
 }
 else
+{
     Console.WriteLine("GoproFileRenameConsoleApp [MP4 파일이 있는 폴더 경로]");
+}
 
 class GoproFileName
 {
